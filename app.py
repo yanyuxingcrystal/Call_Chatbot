@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Request
-from openai_agent import ask_chatbot
+from fastapi import FastAPI
+from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+
+from openai_agent_1 import ask_chatbot
 
 app = FastAPI()
 
+class ChatRequest(BaseModel):
+    message: str
+    user_email: str = None
+
 @app.post("/chat")
-async def chat(req: Request):
-    body = await req.json()
-    user_input = body.get("message")
-    reply = await ask_chatbot(user_input)
+def chat_endpoint(req: ChatRequest):
+    reply = ask_chatbot(req.message, req.user_email)
     return {"reply": reply}
